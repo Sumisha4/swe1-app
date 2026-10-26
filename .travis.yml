@@ -1,0 +1,28 @@
+language: python
+dist: jammy
+python:
+  - "3.12"
+
+install:
+  - pip install -r requirements.txt
+
+script:
+  - black --check .
+  - flake8
+  - coverage run --source=mysite,polls manage.py test
+
+after_success:
+  - coveralls --service-name=travis-pro
+
+# AWS credentials come from the Travis repository settings as
+# AWS_ACCESS_KEY_ID and AWS_SECRET_ACCESS_KEY (never committed here).
+deploy:
+  provider: elasticbeanstalk
+  edge: true
+  region: us-east-2
+  app: django-tutorial
+  env: django-env
+  bucket: elasticbeanstalk-us-east-2-723695983611
+  wait_until_deployed: true
+  on:
+    branch: main
